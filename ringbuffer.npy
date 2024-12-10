@@ -1,0 +1,50 @@
+const RBSIZE = 240
+
+class RingBuffer:
+    head:int
+    index:int
+    #wert:int[RBSIZE]
+    wert:float[RBSIZE]
+    x:int
+    rb:int
+    yoffset:int
+    
+
+    def init(y:int):
+        rb = RBSIZE -1 
+        yoffset = y
+
+
+    def append(num:int):
+        rb = RBSIZE -1
+        if x < rb
+            wert[x]= num
+            #drawPixel(x, start + wert[x])
+            x = x + 1
+ 
+        if x == rb
+            index = index + 1
+            wert[head] = num
+            head = head + 1 
+            if head == RBSIZE
+                head = 0
+                index =0 
+        
+
+
+    def get(position:int)->int
+        element = (head + position) % RBSIZE
+        return wert[element]
+    
+
+
+    def draw():
+        if x < rb
+            for i in x
+                drawPixel(i, yoffset + wert[i])
+                
+ 
+        if x == rb
+            for i in rb
+                element = (index + i) % RBSIZE
+                drawPixel(i, yoffset + wert[element])      

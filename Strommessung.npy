@@ -1,0 +1,54 @@
+import ringbuffer
+const confregister = 0x00
+const shuntvoltageregister = 0x01
+const busvoltageregister = 0x02
+const powerregister = 0x03
+const currentregister = 0x04
+const calibrationregister = 0x05
+
+const ina219address = 0x40
+HSB:int
+LSB:int
+
+werte:RingBuffer
+werte.init(0)
+
+background(0,0,0)
+textFont(FONT_ROBOTO_24)
+clear()
+config = [  0b00111001, 0b10011111]
+writeI2C(ina219address, confregister, 2, config)
+delay(10)
+
+readI2C(ina219address, confregister, 2)
+HSB=getI2CByte()
+LSB=getI2CByte()
+HSB=HSB*256
+register=HSB+LSB
+drawText(10,110, "Register:" + register)
+update()
+delay(1000)
+
+
+
+voltage:int
+voltage2:float
+while true:
+    clear
+    readI2C(ina219address, shuntvoltageregister, 2)
+    HSB=getI2CByte()
+    LSB=getI2CByte()
+    HSB=HSB*256
+    voltage=HSB+LSB
+    #drawText(10,130, "Spannung:" + voltage)
+    voltage2 = 0.0001 * voltage
+    pixel = map(voltage2, 0, 3.2, 239, 0)
+    werte.append(pixel)
+    clear()
+    werte.draw()
+    drawText(10,20, "Strom:" + voltage2)
+    update()
+
+
+
+

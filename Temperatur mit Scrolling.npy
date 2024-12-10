@@ -1,0 +1,45 @@
+import ringbuffer
+
+const PTC_PIN = C_PIN_06
+const SERVO_PIN = C_PIN_01
+const PIEZO_PIN = C_PIN_02
+const BETA = 4050         
+const T25 = 298.15  
+const R25 = 10000.0 
+const FACTOR = 1629 # 1500 .. 3000
+setPWMFrequency(50)
+textFont(FONT_ROBOTO_24)
+werte:RingBuffer
+werte.init(0)
+uri = "mqtt://192.168.2.120"
+connectMQTT(uri, "", "")
+publishTopic = "Temperatur"
+while true:
+	
+    adcValue = readADC(PTC_PIN, 100)
+    Vr:float = 3.3 * adcValue / 4095
+    Vntc:float = 3.3 - Vr
+
+    if Vntc < 3.2:
+        Rntc:float = (Vntc * FACTOR) / (3.3 - Vntc)
+        Tk:float = 1.0/(log(Rntc/R25)/BETA + (1.0/T25))
+        T = Tk - 273.15
+        setPrecision(1)
+        pixel = map(T, 40, 20, 239, 0)
+        werte.append(pixel)
+        clear()
+        werte.draw()
+        drawText(10,20, "T = " + T + "°C")
+        update()
+        
+    else:
+        drawText(10,60, "No NTC dedected")
+    ANGLE = map(T, 40, 10, -90, 90)
+    dutyCycle = map(ANGLE, 90, -90, 102, 512)
+    if T > 30
+        writePWM(PIEZO_PIN,4096/2)   
+    else writePWM(PIEZO_PIN, 0)     
+    writePWM(SERVO_PIN, dutyCycle)
+    publishMQTT(publishTopic, T)
+  
+
